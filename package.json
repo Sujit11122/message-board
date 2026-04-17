@@ -19,6 +19,7 @@
   "homepage": "https://github.com/Sujit11122/message-board#readme",
   "dependencies": {
     "bcrypt": "^6.0.0",
+    "dotenv": "^16.6.1",
     "ejs": "^5.0.2",
     "express": "^5.2.1",
     "express-session": "^1.19.0",
