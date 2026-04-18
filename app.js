@@ -3,6 +3,7 @@ require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
 const db = require('./config/database');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 db.connect();
@@ -14,5 +15,7 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+
+app.use('/', authRoutes);
 
 app.listen(process.env.PORT || 3000, () => console.log('Server running on port 3000'));
