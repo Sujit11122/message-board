@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics</title>
+</head>
+<body>
+    <h1>Topic Statistics</h1>
+    <nav>
+        <a href="/dashboard">Dashboard</a> |
+        <a href="/topics">Topics</a> |
+        <a href="/logout">Logout</a>
+    </nav>
+
+    <hr>
+
+    <h2>Topic Access Counts</h2>
+    <% if (topicsWithCounts.length === 0) { %>
+        <p>No topics yet.</p>
+    <% } else { %>
+        <table border="1" cellpadding="10" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>Topic</th>
+                    <th>Created By</th>
+                    <th>Times Accessed</th>
+                    <th>Total Messages</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% topicsWithCounts.forEach(({ topic, messageCount }) => { %>
+                    <tr>
+                        <td><a href="/topics/<%= topic._id %>"><%= topic.title %></a></td>
+                        <td><%= topic.createdBy ? topic.createdBy.username : 'Unknown' %></td>
+                        <td><%= topic.accessCount %></td>
+                        <td><%= messageCount %></td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    <% } %>
+</body>
+</html>

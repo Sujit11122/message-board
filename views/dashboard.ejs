@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Welcome, <%= username %>!</h1>
+    <nav>
+        <a href="/topics">Browse Topics</a> |
+        <a href="/stats">Statistics</a> |
+        <a href="/logout">Logout</a>
+    </nav>
+
+    <hr>
+
+    <h2>Your Subscribed Topics</h2>
+
+    <% if (topicsWithMessages.length === 0) { %>
+        <p>You are not subscribed to any topics yet. <a href="/topics">Browse topics</a> to subscribe!</p>
+    <% } else { %>
+        <% topicsWithMessages.forEach(({ topic, messages }) => { %>
+            <div style="border: 1px solid #ccc; padding: 15px; margin: 10px 0;">
+                <h3><a href="/topics/<%= topic._id %>"><%= topic.title %></a></h3>
+                <p><%= topic.description %></p>
+
+                <form action="/topics/<%= topic._id %>/unsubscribe" method="POST">
+                    <button type="submit">Unsubscribe</button>
+                </form>
+
+                <h4>Recent Messages:</h4>
+                <% if (messages.length === 0) { %>
+                    <p>No messages yet.</p>
+                <% } else { %>
+                    <% messages.forEach(message => { %>
+                        <div style="background: #f9f9f9; padding: 10px; margin: 5px 0;">
+                            <strong><%= message.author.username %></strong>
+                            <span style="color: gray; font-size: 0.8em;">
+                                <%= new Date(message.createdAt).toLocaleString() %>
+                            </span>
+                            <p><%= message.content %></p>
+                        </div>
+                    <% }) %>
+                <% } %>
+            </div>
+        <% }) %>
+    <% } %>
+</body>
+</html>

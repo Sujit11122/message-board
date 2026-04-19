@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= topic.title %></title>
+</head>
+<body>
+    <h1><%= topic.title %></h1>
+    <nav>
+        <a href="/dashboard">Dashboard</a> |
+        <a href="/topics">Topics</a> |
+        <a href="/logout">Logout</a>
+    </nav>
+
+    <hr>
+
+    <p><%= topic.description %></p>
+    <p>Created by: <strong><%= topic.createdBy ? topic.createdBy.username : 'Unknown' %></strong></p>
+
+    <% if (isSubscribed) { %>
+        <form action="/topics/<%= topic._id %>/unsubscribe" method="POST">
+            <button type="submit">Unsubscribe</button>
+        </form>
+    <% } else { %>
+        <form action="/topics/<%= topic._id %>/subscribe" method="POST">
+            <button type="submit">Subscribe</button>
+        </form>
+    <% } %>
+
+    <hr>
+
+    <% if (isSubscribed) { %>
+        <h2>Post a Message</h2>
+        <form action="/topics/<%= topic._id %>/messages" method="POST">
+            <textarea name="content" rows="3" cols="50" placeholder="Write your message..." required></textarea><br><br>
+            <button type="submit">Post Message</button>
+        </form>
+        <hr>
+    <% } %>
+
+    <h2>All Messages</h2>
+    <% if (messages.length === 0) { %>
+        <p>No messages yet. Be the first to post!</p>
+    <% } else { %>
+        <% messages.forEach(message => { %>
+            <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
+                <strong><%= message.author.username %></strong>
+                <span style="color: gray; font-size: 0.8em;">
+                    <%= new Date(message.createdAt).toLocaleString() %>
+                </span>
+                <p><%= message.content %></p>
+            </div>
+        <% }) %>
+    <% } %>
+</body>
+</html>

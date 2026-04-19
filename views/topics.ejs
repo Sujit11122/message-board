@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Topics</title>
+</head>
+<body>
+    <h1>Topics</h1>
+    <nav>
+        <a href="/dashboard">Dashboard</a> |
+        <a href="/stats">Statistics</a> |
+        <a href="/logout">Logout</a>
+    </nav>
+
+    <hr>
+
+    <% if (error) { %>
+        <p style="color: red;"><%= error %></p>
+    <% } %>
+
+    <h2>Start a New Topic</h2>
+    <form action="/topics" method="POST">
+        <label>Title:</label><br>
+        <input type="text" name="title" required /><br><br>
+        <label>Description:</label><br>
+        <textarea name="description" rows="3" cols="40"></textarea><br><br>
+        <button type="submit">Create Topic</button>
+    </form>
+
+    <hr>
+
+    <h2>All Topics</h2>
+    <% if (topics.length === 0) { %>
+        <p>No topics yet. Be the first to create one!</p>
+    <% } else { %>
+        <% topics.forEach(topic => { %>
+            <div style="border: 1px solid #ccc; padding: 15px; margin: 10px 0;">
+                <h3><a href="/topics/<%= topic._id %>"><%= topic.title %></a></h3>
+                <p><%= topic.description %></p>
+                <p>Created by: <strong><%= topic.createdBy ? topic.createdBy.username : 'Unknown' %></strong></p>
+
+                <% if (subscribedIds.includes(topic._id.toString())) { %>
+                    <form action="/topics/<%= topic._id %>/unsubscribe" method="POST">
+                        <button type="submit">Unsubscribe</button>
+                    </form>
+                <% } else { %>
+                    <form action="/topics/<%= topic._id %>/subscribe" method="POST">
+                        <button type="submit">Subscribe</button>
+                    </form>
+                <% } %>
+            </div>
+        <% }) %>
+    <% } %>
+</body>
+</html>
