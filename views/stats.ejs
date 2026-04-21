@@ -4,41 +4,90 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Statistics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .nav-link { transition: color 0.15s ease, background 0.15s ease; }
+        .nav-link:hover { color: #a5b4fc; background: rgba(99,102,241,0.1); }
+        .row-hover { transition: border-color 0.2s ease; }
+        .row-hover:hover { border-color: #6366f1; }
+        .bar { background: #4f46e5; height: 4px; border-radius: 9999px; transition: width 0.6s ease; }
+    </style>
 </head>
-<body>
-    <h1>Topic Statistics</h1>
-    <nav>
-        <a href="/dashboard">Dashboard</a> |
-        <a href="/topics">Topics</a> |
-        <a href="/logout">Logout</a>
-    </nav>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
 
-    <hr>
+    <%- include('partials/header') %>
 
-    <h2>Topic Access Counts</h2>
-    <% if (topicsWithCounts.length === 0) { %>
-        <p>No topics yet.</p>
-    <% } else { %>
-        <table border="1" cellpadding="10" cellspacing="0">
-            <thead>
-                <tr>
-                    <th>Topic</th>
-                    <th>Created By</th>
-                    <th>Times Accessed</th>
-                    <th>Total Messages</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% topicsWithCounts.forEach(({ topic, messageCount }) => { %>
-                    <tr>
-                        <td><a href="/topics/<%= topic._id %>"><%= topic.title %></a></td>
-                        <td><%= topic.createdBy ? topic.createdBy.username : 'Unknown' %></td>
-                        <td><%= topic.accessCount %></td>
-                        <td><%= messageCount %></td>
-                    </tr>
+    <main class="max-w-5xl mx-auto px-6 py-10">
+
+        <div class="mb-10">
+            <p class="text-indigo-400 mono text-sm mb-1">analytics</p>
+            <h1 class="text-3xl font-semibold text-white">Topic Statistics</h1>
+            <p class="text-gray-500 text-sm mt-2">Access counts and message totals for all topics.</p>
+        </div>
+
+        <% if (topicsWithCounts.length === 0) { %>
+            <div class="border border-dashed border-gray-700 rounded-2xl p-12 text-center">
+                <p class="text-gray-600 mono text-xs mb-2">// no topics yet</p>
+                <p class="text-gray-400">No topics have been created yet.</p>
+            </div>
+        <% } else { %>
+            <% var maxAccess = Math.max.apply(null, topicsWithCounts.map(function(t) { return t.topic.accessCount || 0 })) %>
+            <% if (maxAccess === 0) { maxAccess = 1 } %>
+
+            <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
+
+                <div class="grid grid-cols-12 px-6 py-3 border-b border-gray-800">
+                    <div class="col-span-5 text-xs mono text-gray-500">topic</div>
+                    <div class="col-span-3 text-xs mono text-gray-500">created by</div>
+                    <div class="col-span-2 text-xs mono text-gray-500 text-center">accessed</div>
+                    <div class="col-span-2 text-xs mono text-gray-500 text-center">messages</div>
+                </div>
+
+                <% topicsWithCounts.forEach(function(item) { %>
+                    <% var topic = item.topic %>
+                    <% var messageCount = item.messageCount %>
+                    <% var count = topic.accessCount || 0 %>
+
+                    <div class="row-hover border-b border-gray-800 px-6 py-4" id="row-<%= topic._id %>">
+                        <div class="grid grid-cols-12 items-center mb-3">
+                            <div class="col-span-5">
+                                <a href="/topics/<%= topic._id %>" class="text-white font-medium hover:text-indigo-400 transition-colors text-sm">
+                                    <%= topic.title %>
+                                </a>
+                            </div>
+                            <div class="col-span-3 text-gray-500 text-sm">
+                                <%= topic.createdBy ? topic.createdBy.username : 'Unknown' %>
+                            </div>
+                            <div class="col-span-2 text-center">
+                                <span class="mono text-indigo-400 text-sm font-medium"><%= count %></span>
+                            </div>
+                            <div class="col-span-2 text-center">
+                                <span class="mono text-gray-400 text-sm"><%= messageCount %></span>
+                            </div>
+                        </div>
+                        <div class="w-full bg-gray-800 rounded-full" style="height:4px">
+                            <div class="bar" id="bar-<%= topic._id %>" data-pct="<%= Math.round((count / maxAccess) * 100) %>"></div>
+                        </div>
+                    </div>
+
                 <% }) %>
-            </tbody>
-        </table>
-    <% } %>
+
+            </div>
+
+        <% } %>
+
+    </main>
+
+    <%- include('partials/footer') %>
+
+    <script>
+        document.querySelectorAll('.bar').forEach(function(bar) {
+            bar.style.width = bar.getAttribute('data-pct') + '%'
+        })
+    </script>
+
 </body>
 </html>
