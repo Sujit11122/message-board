@@ -8,12 +8,10 @@ const getRegister = (req, res) => {
 // Handle register form submission
 const postRegister = async (req, res) => {
     try {
-        console.log('Register attempt:', req.body);
         const { username, email, password } = req.body;
 
         // Check if user already exists
         const existingUser = await User.findOne({ email });
-        console.log('Existing user check done');
         if (existingUser) {
             return res.render('register', { error: 'Email already registered' });
         }
@@ -25,10 +23,7 @@ const postRegister = async (req, res) => {
         // Redirect to login
         res.redirect('/login');
     } catch (err) {
-        console.log('Register error NAME:', err.name);
-        console.log('Register error MESSAGE:', err.message);
-        console.log('Register error FULL:', err);
-        res.render('register', { error: err.message });
+        res.render('register', { error: 'Something went wrong' });
     }
 };
 
@@ -61,7 +56,6 @@ const postLogin = async (req, res) => {
         // Redirect to dashboard
         res.redirect('/dashboard');
     } catch (err) {
-        console.log('Register error:', err);
         res.render('login', { error: 'Something went wrong' });
     }
 };

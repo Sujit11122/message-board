@@ -16,8 +16,21 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+app.get('/', (req, res) => {
+    if (req.session.userId) {
+        res.redirect('/dashboard');
+    } else {
+        res.redirect('/login');
+    }
+});
 
 app.use('/', authRoutes);
 app.use('/', topicRoutes); 
 
-app.listen(process.env.PORT || 3000, () => console.log('Server running on port 3000'));
+app.listen(process.env.PORT || 3000, () => {
+    console.log('');
+    console.log(' Server ready!');
+    console.log('');
+    console.log('Local:   http://localhost:3000/');
+    console.log('');
+});
