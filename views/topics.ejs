@@ -4,53 +4,96 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Topics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .nav-link { transition: color 0.15s ease, background 0.15s ease; }
+        .nav-link:hover { color: #a5b4fc; background: rgba(99,102,241,0.1); }
+        .card-hover { transition: border-color 0.2s ease, transform 0.2s ease; }
+        .card-hover:hover { border-color: #6366f1; transform: translateY(-2px); }
+        .sub-btn { transition: background 0.15s ease, color 0.15s ease; }
+        .sub-btn:hover { background: #4f46e5; }
+        .input-field { background: #111827; border: 1px solid #1f2937; color: #f3f4f6; transition: border-color 0.15s ease; }
+        .input-field:focus { outline: none; border-color: #6366f1; }
+        .input-field::placeholder { color: #4b5563; }
+    </style>
 </head>
-<body>
-    <h1>Topics</h1>
-    <nav>
-        <a href="/dashboard">Dashboard</a> |
-        <a href="/stats">Statistics</a> |
-        <a href="/logout">Logout</a>
-    </nav>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
 
-    <hr>
+    <%- include('partials/header') %>
 
-    <% if (error) { %>
-        <p style="color: red;"><%= error %></p>
-    <% } %>
+    <main class="max-w-5xl mx-auto px-6 py-10">
 
-    <h2>Start a New Topic</h2>
-    <form action="/topics" method="POST">
-        <label>Title:</label><br>
-        <input type="text" name="title" required /><br><br>
-        <label>Description:</label><br>
-        <textarea name="description" rows="3" cols="40"></textarea><br><br>
-        <button type="submit">Create Topic</button>
-    </form>
+        <div class="mb-10">
+            <p class="text-indigo-400 mono text-sm mb-1">explore</p>
+            <h1 class="text-3xl font-semibold text-white">All Topics</h1>
+        </div>
 
-    <hr>
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-10">
+            <h2 class="text-base font-medium text-gray-200 mb-4">Start a new topic</h2>
+            <form action="/topics" method="POST" class="flex flex-col gap-4">
+                <div>
+                    <label class="block text-gray-400 text-sm mb-2 mono">title</label>
+                    <input type="text" name="title" required placeholder="Topic title" class="input-field w-full rounded-lg px-4 py-3 text-sm" />
+                </div>
+                <div>
+                    <label class="block text-gray-400 text-sm mb-2 mono">description</label>
+                    <input type="text" name="description" placeholder="Short description (optional)" class="input-field w-full rounded-lg px-4 py-3 text-sm" />
+                </div>
+                <button type="submit" class="sub-btn bg-indigo-600 text-white font-medium text-sm py-3 rounded-lg cursor-pointer transition-colors w-full">
+                    Create Topic
+                </button>
+            </form>
+        </div>
 
-    <h2>All Topics</h2>
-    <% if (topics.length === 0) { %>
-        <p>No topics yet. Be the first to create one!</p>
-    <% } else { %>
-        <% topics.forEach(topic => { %>
-            <div style="border: 1px solid #ccc; padding: 15px; margin: 10px 0;">
-                <h3><a href="/topics/<%= topic._id %>"><%= topic.title %></a></h3>
-                <p><%= topic.description %></p>
-                <p>Created by: <strong><%= topic.createdBy ? topic.createdBy.username : 'Unknown' %></strong></p>
+        <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-lg font-medium text-gray-200">Browse Topics</h2>
+            <span class="mono text-xs text-gray-500 bg-gray-800 px-3 py-1 rounded-full"><%= topics.length %> topics</span>
+        </div>
 
-                <% if (subscribedIds.includes(topic._id.toString())) { %>
-                    <form action="/topics/<%= topic._id %>/unsubscribe" method="POST">
-                        <button type="submit">Unsubscribe</button>
-                    </form>
-                <% } else { %>
-                    <form action="/topics/<%= topic._id %>/subscribe" method="POST">
-                        <button type="submit">Subscribe</button>
-                    </form>
-                <% } %>
+        <% if (topics.length === 0) { %>
+            <div class="border border-dashed border-gray-700 rounded-2xl p-12 text-center">
+                <p class="text-gray-600 mono text-xs mb-2">// no topics yet</p>
+                <p class="text-gray-400">Be the first to start a topic above.</p>
             </div>
-        <% }) %>
-    <% } %>
+        <% } else { %>
+            <div class="flex flex-col gap-4">
+                <% topics.forEach(topic => { %>
+                    <div class="card-hover border border-gray-800 bg-gray-900 rounded-2xl p-6 flex items-start justify-between gap-4">
+                        <div class="flex-1">
+                            <a href="/topics/<%= topic._id %>" class="text-lg font-semibold text-white hover:text-indigo-400 transition-colors">
+                                <%= topic.title %>
+                            </a>
+                            <p class="text-gray-500 text-sm mt-1"><%= topic.description %></p>
+                            <div class="flex items-center gap-4 mt-3">
+                                <span class="mono text-xs text-gray-600"><%= topic.subscribers ? topic.subscribers.length : 0 %> subscribers</span>
+                                <span class="mono text-xs text-gray-600"><%= topic.accessCount || 0 %> views</span>
+                            </div>
+                        </div>
+                        <% const isSubscribed = topic.subscribers && topic.subscribers.map(s => s.toString()).includes(userId) %>
+                        <% if (isSubscribed) { %>
+                            <form action="/topics/<%= topic._id %>/unsubscribe" method="POST">
+                                <button type="submit" class="border border-gray-700 text-gray-400 text-xs px-3 py-1.5 rounded-lg mono cursor-pointer hover:border-red-500 hover:text-red-400 transition-colors">
+                                    subscribed
+                                </button>
+                            </form>
+                        <% } else { %>
+                            <form action="/topics/<%= topic._id %>/subscribe" method="POST">
+                                <button type="submit" class="sub-btn bg-indigo-600 text-white text-xs px-3 py-1.5 rounded-lg mono cursor-pointer">
+                                    subscribe
+                                </button>
+                            </form>
+                        <% } %>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+
+    </main>
+
+    <%- include('partials/footer') %>
+
 </body>
 </html>

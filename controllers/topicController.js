@@ -42,6 +42,7 @@ const getAllTopics = async (req, res) => {
         res.render('topics', {
             topics: allTopics,
             subscribedIds,
+            userId: req.session.userId.toString(),
             username: req.session.username,
             error: req.query.error || null
         });
@@ -49,6 +50,7 @@ const getAllTopics = async (req, res) => {
         res.render('topics', {
             topics: [],
             subscribedIds: [],
+            userId: '',
             username: req.session.username,
             error: 'Could not load topics.'
         });

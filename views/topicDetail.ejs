@@ -3,55 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= topic.title %></title>
+    <title>Topic</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Space Grotesk', sans-serif; }
+        .mono { font-family: 'JetBrains Mono', monospace; }
+        .nav-link { transition: color 0.15s ease, background 0.15s ease; }
+        .nav-link:hover { color: #a5b4fc; background: rgba(99,102,241,0.1); }
+        .msg-item { border-left: 2px solid #1f2937; transition: border-color 0.15s ease; }
+        .msg-item:hover { border-left-color: #6366f1; }
+        .input-field { background: #111827; border: 1px solid #1f2937; color: #f3f4f6; transition: border-color 0.15s ease; }
+        .input-field:focus { outline: none; border-color: #6366f1; }
+        .input-field::placeholder { color: #4b5563; }
+    </style>
 </head>
-<body>
-    <h1><%= topic.title %></h1>
-    <nav>
-        <a href="/dashboard">Dashboard</a> |
-        <a href="/topics">Topics</a> |
-        <a href="/logout">Logout</a>
-    </nav>
+<body class="bg-gray-950 text-gray-100 min-h-screen">
 
-    <hr>
+    <%- include('partials/header') %>
 
-    <p><%= topic.description %></p>
-    <p>Created by: <strong><%= topic.createdBy ? topic.createdBy.username : 'Unknown' %></strong></p>
+    <main class="max-w-5xl mx-auto px-6 py-10">
 
-    <% if (isSubscribed) { %>
-        <form action="/topics/<%= topic._id %>/unsubscribe" method="POST">
-            <button type="submit">Unsubscribe</button>
-        </form>
-    <% } else { %>
-        <form action="/topics/<%= topic._id %>/subscribe" method="POST">
-            <button type="submit">Subscribe</button>
-        </form>
-    <% } %>
+        <div class="mb-2">
+            <a href="/topics" class="text-indigo-400 mono text-sm hover:text-indigo-300 transition-colors">← back to topics</a>
+        </div>
 
-    <hr>
-
-    <% if (isSubscribed) { %>
-        <h2>Post a Message</h2>
-        <form action="/topics/<%= topic._id %>/messages" method="POST">
-            <textarea name="content" rows="3" cols="50" placeholder="Write your message..." required></textarea><br><br>
-            <button type="submit">Post Message</button>
-        </form>
-        <hr>
-    <% } %>
-
-    <h2>All Messages</h2>
-    <% if (messages.length === 0) { %>
-        <p>No messages yet. Be the first to post!</p>
-    <% } else { %>
-        <% messages.forEach(message => { %>
-            <div style="border: 1px solid #ccc; padding: 10px; margin: 10px 0;">
-                <strong><%= message.author.username %></strong>
-                <span style="color: gray; font-size: 0.8em;">
-                    <%= new Date(message.createdAt).toLocaleString() %>
-                </span>
-                <p><%= message.content %></p>
+        <div class="mb-8 mt-4">
+            <h1 class="text-3xl font-semibold text-white"><%= topic.title %></h1>
+            <p class="text-gray-500 mt-2"><%= topic.description %></p>
+            <div class="flex items-center gap-4 mt-3">
+                <span class="mono text-xs text-gray-600"><%= topic.subscribers ? topic.subscribers.length : 0 %> subscribers</span>
+                <span class="mono text-xs text-gray-600"><%= topic.accessCount || 0 %> views</span>
             </div>
-        <% }) %>
-    <% } %>
+        </div>
+
+        <% if (isSubscribed) { %>
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-10">
+            <h2 class="text-base font-medium text-gray-200 mb-4">Post a message</h2>
+            <form action="/topics/<%= topic._id %>/messages" method="POST" class="flex flex-col gap-4">
+                <textarea
+                    name="content"
+                    required
+                    placeholder="Write your message..."
+                    rows="3"
+                    class="input-field w-full rounded-lg px-4 py-3 text-sm resize-none"
+                ></textarea>
+                <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm py-2.5 rounded-lg cursor-pointer transition-colors">
+                    Post Message
+                </button>
+            </form>
+        </div>
+        <% } %>
+
+        <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-lg font-medium text-gray-200">Messages</h2>
+            <span class="mono text-xs text-gray-500 bg-gray-800 px-3 py-1 rounded-full"><%= messages.length %> messages</span>
+        </div>
+
+        <% if (messages.length === 0) { %>
+            <div class="border border-dashed border-gray-700 rounded-2xl p-12 text-center">
+                <p class="text-gray-600 mono text-xs mb-2">// no messages yet</p>
+                <p class="text-gray-400">Be the first to post in this topic.</p>
+            </div>
+        <% } else { %>
+            <div class="flex flex-col gap-4">
+                <% messages.forEach(message => { %>
+                    <div class="msg-item pl-5 py-2">
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-indigo-400 text-sm font-medium"><%= message.author.username %></span>
+                            <span class="text-gray-600 mono text-xs"><%= new Date(message.createdAt).toLocaleString() %></span>
+                        </div>
+                        <p class="text-gray-300 text-sm"><%= message.content %></p>
+                    </div>
+                <% }) %>
+            </div>
+        <% } %>
+
+    </main>
+
+    <%- include('partials/footer') %>
+
 </body>
 </html>
