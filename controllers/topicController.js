@@ -109,7 +109,8 @@ const getTopicDetail = async (req, res) => {
             topic,
             messages,
             isSubscribed,
-            username: req.session.username
+            username: req.session.username,
+            currentUserId: req.session.userId.toString()
         });
     } catch (err) {
         res.redirect('/topics');

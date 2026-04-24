@@ -34,5 +34,47 @@ const postMessage = async (req, res) => {
         res.redirect(`/topics/${topicId}`);
     }
 };
+const deleteMessage = async (req, res) => {
+    try {
+        const message = await Message.findById(req.params.messageId);
 
-module.exports = { postMessage };
+        if (!message) return res.redirect('back');
+
+        // Only author can delete
+        if (message.author.toString() !== req.session.userId.toString()) {
+            return res.redirect('back');
+        }
+
+        const topicId = message.topic;
+        await Message.findByIdAndDelete(req.params.messageId);
+
+        res.redirect(`/topics/${topicId}`);
+    } catch (err) {
+        res.redirect('back');
+    }
+};
+
+const editMessage = async (req, res) => {
+    try {
+        const message = await Message.findById(req.params.messageId);
+
+        if (!message) return res.redirect('back');
+
+        // Only author can edit
+        if (message.author.toString() !== req.session.userId.toString()) {
+            return res.redirect('back');
+        }
+
+        await Message.findByIdAndUpdate(req.params.messageId, {
+            content: req.body.content,
+            isEdited: true,
+            updatedAt: new Date()
+        });
+
+        res.redirect(`/topics/${message.topic}`);
+    } catch (err) {
+        res.redirect('back');
+    }
+};
+
+module.exports = { postMessage, deleteMessage, editMessage };

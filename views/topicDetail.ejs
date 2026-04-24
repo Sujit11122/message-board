@@ -1,87 +1,190 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Topic</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
     <style>
-        body { font-family: 'Space Grotesk', sans-serif; }
-        .mono { font-family: 'JetBrains Mono', monospace; }
-        .nav-link { transition: color 0.15s ease, background 0.15s ease; }
-        .nav-link:hover { color: #a5b4fc; background: rgba(99,102,241,0.1); }
-        .msg-item { border-left: 2px solid #1f2937; transition: border-color 0.15s ease; }
-        .msg-item:hover { border-left-color: #6366f1; }
-        .input-field { background: #111827; border: 1px solid #1f2937; color: #f3f4f6; transition: border-color 0.15s ease; }
-        .input-field:focus { outline: none; border-color: #6366f1; }
-        .input-field::placeholder { color: #4b5563; }
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .nav-link {
+            transition: color 0.15s ease, background 0.15s ease;
+        }
+
+        .nav-link:hover {
+            color: #a5b4fc;
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .msg-item {
+            border-left: 2px solid #1f2937;
+            transition: border-color 0.15s ease;
+        }
+
+        .msg-item:hover {
+            border-left-color: #6366f1;
+        }
+
+        .input-field {
+            background: #111827;
+            border: 1px solid #1f2937;
+            color: #f3f4f6;
+            transition: border-color 0.15s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+
+        .input-field::placeholder {
+            color: #4b5563;
+        }
     </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen">
 
+<body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
     <%- include('partials/header') %>
 
-    <main class="max-w-5xl mx-auto px-6 py-10">
+        <main class="max-w-5xl mx-auto px-6 py-10 flex-1 w-full">
 
-        <div class="mb-2">
-            <a href="/topics" class="text-indigo-400 mono text-sm hover:text-indigo-300 transition-colors">← back to topics</a>
-        </div>
-
-        <div class="mb-8 mt-4">
-            <h1 class="text-3xl font-semibold text-white"><%= topic.title %></h1>
-            <p class="text-gray-500 mt-2"><%= topic.description %></p>
-            <div class="flex items-center gap-4 mt-3">
-                <span class="mono text-xs text-gray-600"><%= topic.subscribers ? topic.subscribers.length : 0 %> subscribers</span>
-                <span class="mono text-xs text-gray-600"><%= topic.accessCount || 0 %> views</span>
+            <div class="mb-2">
+                <a href="/topics" class="text-indigo-400 mono text-sm hover:text-indigo-300 transition-colors">← back to
+                    topics</a>
             </div>
-        </div>
 
-        <% if (isSubscribed) { %>
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-10">
-            <h2 class="text-base font-medium text-gray-200 mb-4">Post a message</h2>
-            <form action="/topics/<%= topic._id %>/messages" method="POST" class="flex flex-col gap-4">
-                <textarea
-                    name="content"
-                    required
-                    placeholder="Write your message..."
-                    rows="3"
-                    class="input-field w-full rounded-lg px-4 py-3 text-sm resize-none"
-                ></textarea>
-                <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm py-2.5 rounded-lg cursor-pointer transition-colors">
-                    Post Message
-                </button>
-            </form>
-        </div>
-        <% } %>
-
-        <div class="mb-6 flex items-center justify-between">
-            <h2 class="text-lg font-medium text-gray-200">Messages</h2>
-            <span class="mono text-xs text-gray-500 bg-gray-800 px-3 py-1 rounded-full"><%= messages.length %> messages</span>
-        </div>
-
-        <% if (messages.length === 0) { %>
-            <div class="border border-dashed border-gray-700 rounded-2xl p-12 text-center">
-                <p class="text-gray-600 mono text-xs mb-2">// no messages yet</p>
-                <p class="text-gray-400">Be the first to post in this topic.</p>
+            <div class="mb-8 mt-4">
+                <h1 class="text-3xl font-semibold text-white">
+                    <%= topic.title %>
+                </h1>
+                <p class="text-gray-500 mt-2">
+                    <%= topic.description %>
+                </p>
+                <div class="flex items-center gap-4 mt-3">
+                    <span class="mono text-xs text-gray-600">
+                        <%= topic.subscribers ? topic.subscribers.length : 0 %> subscribers
+                    </span>
+                    <span class="mono text-xs text-gray-600">
+                        <%= topic.accessCount || 0 %> views
+                    </span>
+                </div>
             </div>
-        <% } else { %>
-            <div class="flex flex-col gap-4">
-                <% messages.forEach(message => { %>
-                    <div class="msg-item pl-5 py-2">
-                        <div class="flex items-center gap-2 mb-1">
-                            <span class="text-indigo-400 text-sm font-medium"><%= message.author.username %></span>
-                            <span class="text-gray-600 mono text-xs"><%= new Date(message.createdAt).toLocaleString() %></span>
-                        </div>
-                        <p class="text-gray-300 text-sm"><%= message.content %></p>
+
+            <% if (isSubscribed) { %>
+                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-10">
+                    <h2 class="text-base font-medium text-gray-200 mb-4">Post a message</h2>
+                    <form action="/topics/<%= topic._id %>/messages" method="POST" class="flex flex-col gap-4">
+                        <textarea name="content" required placeholder="Write your message..." rows="3"
+                            class="input-field w-full rounded-lg px-4 py-3 text-sm resize-none"></textarea>
+                        <button type="submit"
+                            class="bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm py-2.5 rounded-lg cursor-pointer transition-colors">
+                            Post Message
+                        </button>
+                    </form>
+                </div>
+                <% } %>
+
+                    <div class="mb-6 flex items-center justify-between">
+                        <h2 class="text-lg font-medium text-gray-200">Messages</h2>
+                        <span class="mono text-xs text-gray-500 bg-gray-800 px-3 py-1 rounded-full">
+                            <%= messages.length %> messages
+                        </span>
                     </div>
-                <% }) %>
-            </div>
-        <% } %>
 
-    </main>
+                    <% if (messages.length===0) { %>
+                        <div class="border border-dashed border-gray-700 rounded-2xl p-12 text-center">
+                            <p class="text-gray-600 mono text-xs mb-2">// no messages yet</p>
+                            <p class="text-gray-400">Be the first to post in this topic.</p>
+                        </div>
+                        <% } else { %>
+                            <div class="flex flex-col gap-4">
+                                <% messages.forEach(message=> { %>
+                                    <div class="msg-item pl-5 py-2">
 
-    <%- include('partials/footer') %>
+                                        <div class="flex items-center justify-between mb-1">
+                                            <div class="flex items-center gap-2">
+                                                <span class="text-indigo-400 text-sm font-medium">
+                                                    <%= message.author.username %>
+                                                </span>
+                                                <span class="text-gray-600 mono text-xs">
+                                                    <%= new Date(message.createdAt).toLocaleString() %>
+                                                </span>
+                                            </div>
+
+                                            <% if (currentUserId && message.author._id.toString()===currentUserId) { %>
+                                                <div class="flex items-center gap-3">
+                                                    <button onclick="toggleEdit('<%= message._id %>')"
+                                                        class="mono text-xs text-gray-500 hover:text-indigo-400 transition-colors cursor-pointer">
+                                                        edit
+                                                    </button>
+                                                    <form action="/messages/<%= message._id %>/delete" method="POST"
+                                                        onsubmit="return confirm('Delete this message?')">
+                                                        <button type="submit"
+                                                            class="mono text-xs text-gray-500 hover:text-red-400 transition-colors cursor-pointer">
+                                                            delete
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                                <% } %>
+                                        </div>
+
+                                        <!-- Message content -->
+                                        <p class="text-gray-300 text-sm" id="content-<%= message._id %>">
+                                            <%= message.content %>
+                                        </p>
+                                        <% if (message.isEdited) { %>
+                                            <span class="mono text-xs text-gray-600">
+                                                edited · <%= new Date(message.updatedAt).toLocaleString() %>
+                                            </span>
+                                            <% } %>
+
+                                                <!-- Edit form hidden by default -->
+                                                <form action="/messages/<%= message._id %>/edit" method="POST"
+                                                    id="edit-form-<%= message._id %>"
+                                                    class="hidden mt-2 flex flex-col gap-2">
+                                                    <textarea name="content" rows="2"
+                                                        class="input-field w-full rounded-lg px-3 py-2 text-sm resize-none"><%= message.content %></textarea>
+                                                    <div class="flex gap-2">
+                                                        <button type="submit"
+                                                            class="bg-indigo-600 hover:bg-indigo-500 text-white text-xs px-3 py-1.5 rounded-lg cursor-pointer transition-colors">
+                                                            save
+                                                        </button>
+                                                        <button type="button" onclick="toggleEdit('<%= message._id %>')"
+                                                            class="border border-gray-700 text-gray-400 text-xs px-3 py-1.5 rounded-lg cursor-pointer hover:border-gray-500 transition-colors">
+                                                            cancel
+                                                        </button>
+                                                    </div>
+                                                </form>
+
+                                    </div>
+                                    <% }) %>
+                            </div>
+                            <% } %>
+
+        </main>
+
+        <%- include('partials/footer') %>
+
+            <script>
+                function toggleEdit(messageId) {
+                    const content = document.getElementById('content-' + messageId);
+                    const form = document.getElementById('edit-form-' + messageId);
+                    content.classList.toggle('hidden');
+                    form.classList.toggle('hidden');
+                }
+            </script>
 
 </body>
+
 </html>
