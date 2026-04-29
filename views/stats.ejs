@@ -10,18 +10,24 @@
         body { font-family: 'Space Grotesk', sans-serif; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         .nav-link { transition: color 0.15s ease, background 0.15s ease; }
-        .nav-link:hover { color: #a5b4fc; background: rgba(99,102,241,0.1); }
+        .nav-link:hover { color: #5eead4; background: rgba(13,148,136,0.1); }
         .row-hover { transition: border-color 0.2s ease; }
-        .row-hover:hover { border-color: #6366f1; }
-        .bar { background: #4f46e5; height: 4px; border-radius: 9999px; transition: width 0.6s ease; }
+        .row-hover:hover { border-color: #0d9488; }
+        .bar {
+            background: linear-gradient(to right, #0d9488, #0891b2);
+            height: 4px;
+            border-radius: 9999px;
+            transition: width 0.6s ease;
+        }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
     <%- include('partials/header') %>
+
     <main class="max-w-5xl mx-auto px-6 py-10 flex-1 w-full">
 
         <div class="mb-10">
-            <p class="text-indigo-400 mono text-sm mb-1">analytics</p>
+            <p class="text-teal-400 mono text-sm mb-1">analytics</p>
             <h1 class="text-3xl font-semibold text-white">Topic Statistics</h1>
             <p class="text-gray-500 text-sm mt-2">Access counts and message totals for all topics.</p>
         </div>
@@ -37,6 +43,7 @@
 
             <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden">
 
+                <!-- Table Header -->
                 <div class="grid grid-cols-12 px-6 py-3 border-b border-gray-800">
                     <div class="col-span-5 text-xs mono text-gray-500">topic</div>
                     <div class="col-span-3 text-xs mono text-gray-500">created by</div>
@@ -52,7 +59,8 @@
                     <div class="row-hover border-b border-gray-800 px-6 py-4" id="row-<%= topic._id %>">
                         <div class="grid grid-cols-12 items-center mb-3">
                             <div class="col-span-5">
-                                <a href="/topics/<%= topic._id %>" class="text-white font-medium hover:text-indigo-400 transition-colors text-sm">
+                                <a href="/topics/<%= topic._id %>"
+                                    class="text-white font-medium hover:text-teal-400 transition-colors text-sm">
                                     <%= topic.title %>
                                 </a>
                             </div>
@@ -60,14 +68,17 @@
                                 <%= topic.createdBy ? topic.createdBy.username : 'Unknown' %>
                             </div>
                             <div class="col-span-2 text-center">
-                                <span class="mono text-indigo-400 text-sm font-medium"><%= count %></span>
+                                <span class="mono text-teal-400 text-sm font-medium"><%= count %></span>
                             </div>
                             <div class="col-span-2 text-center">
                                 <span class="mono text-gray-400 text-sm"><%= messageCount %></span>
                             </div>
                         </div>
+                        <!-- Progress bar -->
                         <div class="w-full bg-gray-800 rounded-full" style="height:4px">
-                            <div class="bar" id="bar-<%= topic._id %>" data-pct="<%= Math.round((count / maxAccess) * 100) %>"></div>
+                            <div class="bar" id="bar-<%= topic._id %>"
+                                data-pct="<%= Math.round((count / maxAccess) * 100) %>">
+                            </div>
                         </div>
                     </div>
 

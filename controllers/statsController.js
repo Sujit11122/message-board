@@ -1,8 +1,11 @@
 const Topic = require('../models/Topic');
 const Message = require('../models/Message');
+const User = require('../models/User'); // ← add this
 
 const getStats = async (req, res) => {
     try {
+        const user = await User.findById(req.session.userId); // ← add this
+
         const topics = await Topic.find()
             .populate('createdBy', 'username')
             .sort({ accessCount: -1 });
@@ -16,12 +19,14 @@ const getStats = async (req, res) => {
 
         res.render('stats', {
             topicsWithCounts,
-            username: req.session.username
+            username: req.session.username,
+            unreadCount: user.unreadCount 
         });
     } catch (err) {
         res.render('stats', {
             topicsWithCounts: [],
-            username: req.session.username
+            username: req.session.username,
+            unreadCount: 0 
         });
     }
 };

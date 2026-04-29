@@ -10,13 +10,13 @@
         body { font-family: 'Space Grotesk', sans-serif; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         .card-hover { transition: border-color 0.2s ease, transform 0.2s ease; }
-        .card-hover:hover { border-color: #6366f1; transform: translateY(-2px); }
+        .card-hover:hover { border-color: #0d9488; transform: translateY(-2px); }
         .nav-link { transition: color 0.15s ease, background 0.15s ease; }
-        .nav-link:hover { color: #a5b4fc; background: rgba(99,102,241,0.1); }
+        .nav-link:hover { color: #5eead4; background: rgba(13,148,136,0.1); }
         .unsub-btn { transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease; }
         .unsub-btn:hover { background: #ef4444; color: white; border-color: #ef4444; }
         .msg-item { border-left: 2px solid #1f2937; transition: border-color 0.15s ease; }
-        .msg-item:hover { border-left-color: #6366f1; }
+        .msg-item:hover { border-left-color: #0d9488; }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
@@ -26,7 +26,7 @@
     <main class="max-w-5xl mx-auto px-6 py-10 flex-1 w-full">
 
         <div class="mb-10">
-            <p class="text-indigo-400 mono text-sm mb-1">welcome back</p>
+            <p class="text-teal-400 mono text-sm mb-1">welcome back</p>
             <h1 class="text-3xl font-semibold text-white"><%= username %><span class="text-gray-700 animate-pulse"> _</span></h1>
         </div>
 
@@ -39,7 +39,7 @@
             <div class="border border-dashed border-gray-700 rounded-2xl p-14 text-center">
                 <p class="text-gray-600 mono text-xs mb-3">// no subscriptions found</p>
                 <p class="text-gray-400 mb-6">You haven't subscribed to any topics yet.</p>
-                <a href="/topics" class="inline-block bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-colors">
+                <a href="/topics" class="inline-block bg-gradient-to-r from-teal-600 to-cyan-600 hover:opacity-90 text-white text-sm font-medium px-5 py-2.5 rounded-lg transition-opacity">
                     Browse Topics
                 </a>
             </div>
@@ -50,7 +50,7 @@
 
                         <div class="flex items-start justify-between mb-4">
                             <div>
-                                <a href="/topics/<%= topic._id %>" class="text-lg font-semibold text-white hover:text-indigo-400 transition-colors">
+                                <a href="/topics/<%= topic._id %>" class="text-lg font-semibold text-white hover:text-teal-400 transition-colors">
                                     <%= topic.title %>
                                 </a>
                                 <p class="text-gray-500 text-sm mt-1"><%= topic.description %></p>
@@ -71,7 +71,7 @@
                                     <% messages.forEach(message => { %>
                                         <div class="msg-item pl-4 py-1">
                                             <div class="flex items-center gap-2 mb-1">
-                                                <span class="text-indigo-400 text-sm font-medium"><%= message.author.username %></span>
+                                                <span class="text-teal-400 text-sm font-medium"><%= message.author.username %></span>
                                                 <span class="text-gray-600 mono text-xs"><%= new Date(message.createdAt).toLocaleString() %></span>
                                             </div>
                                             <p class="text-gray-300 text-sm"><%= message.content %></p>

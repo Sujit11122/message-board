@@ -10,41 +10,46 @@
         body { font-family: 'Space Grotesk', sans-serif; }
         .mono { font-family: 'JetBrains Mono', monospace; }
         .nav-link { transition: color 0.15s ease, background 0.15s ease; }
-        .nav-link:hover { color: #a5b4fc; background: rgba(99,102,241,0.1); }
+        .nav-link:hover { color: #5eead4; background: rgba(13,148,136,0.1); }
         .card-hover { transition: border-color 0.2s ease, transform 0.2s ease; }
-        .card-hover:hover { border-color: #6366f1; transform: translateY(-2px); }
-        .sub-btn { transition: background 0.15s ease, color 0.15s ease; }
-        .sub-btn:hover { background: #4f46e5; }
-        .input-field { background: #111827; border: 1px solid #1f2937; color: #f3f4f6; transition: border-color 0.15s ease; }
-        .input-field:focus { outline: none; border-color: #6366f1; }
-        .input-field::placeholder { color: #4b5563; }
+        .card-hover:hover { border-color: #0d9488; transform: translateY(-2px); }
+        .sub-btn { transition: opacity 0.15s ease, transform 0.1s ease; }
+        .sub-btn:hover { opacity: 0.9; }
+        .sub-btn:active { transform: scale(0.98); }
+        .input-field { background: #0d1520; border: 1px solid #1e293b; color: #f1f5f9; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+        .input-field:focus { outline: none; border-color: #0d9488; box-shadow: 0 0 0 3px rgba(13,148,136,0.15); }
+        .input-field::placeholder { color: #475569; }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen flex flex-col">
     <%- include('partials/header') %>
+
     <main class="max-w-5xl mx-auto px-6 py-10 flex-1 w-full">
+
         <div class="mb-10">
-            <p class="text-indigo-400 mono text-sm mb-1">explore</p>
+            <p class="text-teal-400 mono text-sm mb-1">explore</p>
             <h1 class="text-3xl font-semibold text-white">All Topics</h1>
         </div>
 
+        <!-- Create Topic Form -->
         <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6 mb-10">
             <h2 class="text-base font-medium text-gray-200 mb-4">Start a new topic</h2>
             <form action="/topics" method="POST" class="flex flex-col gap-4">
                 <div>
-                    <label class="block text-gray-400 text-sm mb-2 mono">title</label>
-                    <input type="text" name="title" required placeholder="Topic title" class="input-field w-full rounded-lg px-4 py-3 text-sm" />
+                    <label class="block text-slate-400 text-xs mb-2 mono tracking-wider uppercase">Title</label>
+                    <input type="text" name="title" required placeholder="Topic title" class="input-field w-full rounded-xl px-4 py-3 text-sm" />
                 </div>
                 <div>
-                    <label class="block text-gray-400 text-sm mb-2 mono">description</label>
-                    <input type="text" name="description" placeholder="Short description (optional)" class="input-field w-full rounded-lg px-4 py-3 text-sm" />
+                    <label class="block text-slate-400 text-xs mb-2 mono tracking-wider uppercase">Description</label>
+                    <input type="text" name="description" placeholder="Short description (optional)" class="input-field w-full rounded-xl px-4 py-3 text-sm" />
                 </div>
-                <button type="submit" class="sub-btn bg-indigo-600 text-white font-medium text-sm py-3 rounded-lg cursor-pointer transition-colors w-full">
-                    Create Topic
+                <button type="submit" class="sub-btn bg-gradient-to-r from-teal-600 to-cyan-600 text-white font-medium text-sm py-3 rounded-xl cursor-pointer w-full shadow-lg shadow-teal-900/30">
+                    Create Topic →
                 </button>
             </form>
         </div>
 
+        <!-- Browse Topics -->
         <div class="mb-6 flex items-center justify-between">
             <h2 class="text-lg font-medium text-gray-200">Browse Topics</h2>
             <span class="mono text-xs text-gray-500 bg-gray-800 px-3 py-1 rounded-full"><%= topics.length %> topics</span>
@@ -60,7 +65,7 @@
                 <% topics.forEach(topic => { %>
                     <div class="card-hover border border-gray-800 bg-gray-900 rounded-2xl p-6 flex items-start justify-between gap-4">
                         <div class="flex-1">
-                            <a href="/topics/<%= topic._id %>" class="text-lg font-semibold text-white hover:text-indigo-400 transition-colors">
+                            <a href="/topics/<%= topic._id %>" class="text-lg font-semibold text-white hover:text-teal-400 transition-colors">
                                 <%= topic.title %>
                             </a>
                             <p class="text-gray-500 text-sm mt-1"><%= topic.description %></p>
@@ -73,12 +78,12 @@
                         <% if (isSubscribed) { %>
                             <form action="/topics/<%= topic._id %>/unsubscribe" method="POST">
                                 <button type="submit" class="border border-gray-700 text-gray-400 text-xs px-3 py-1.5 rounded-lg mono cursor-pointer hover:border-red-500 hover:text-red-400 transition-colors">
-                                    subscribed
+                                    unsubscribe
                                 </button>
                             </form>
                         <% } else { %>
                             <form action="/topics/<%= topic._id %>/subscribe" method="POST">
-                                <button type="submit" class="sub-btn bg-indigo-600 text-white text-xs px-3 py-1.5 rounded-lg mono cursor-pointer">
+                                <button type="submit" class="sub-btn bg-gradient-to-r from-teal-600 to-cyan-600 text-white text-xs px-3 py-1.5 rounded-lg mono cursor-pointer shadow-sm shadow-teal-900/30">
                                     subscribe
                                 </button>
                             </form>

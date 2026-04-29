@@ -12,7 +12,11 @@ class TopicSubject {
     }
 
     notify(event, data) {
-        this.observers.forEach(observer => observer.update(event, data));
+        this.observers.forEach(observer => {
+            // Handle both sync and async observers ✅
+            Promise.resolve(observer.update(event, data))
+                .catch(err => console.log(`[Subject] Observer error for event "${event}":`, err));
+        });
     }
 }
 

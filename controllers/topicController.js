@@ -21,13 +21,15 @@ const getDashboard = async (req, res) => {
 
         res.render('dashboard', {
             username: req.session.username,
-            topicsWithMessages
+            topicsWithMessages,
+            unreadCount: user.unreadCount
         });
     } catch (err) {
         console.error('Dashboard error:', err);
         res.render('dashboard', {
             username: req.session.username,
             topicsWithMessages: [],
+            unreadCount: 0,
             error: 'Could not load dashboard.'
         });
     }
@@ -44,7 +46,8 @@ const getAllTopics = async (req, res) => {
             subscribedIds,
             userId: req.session.userId.toString(),
             username: req.session.username,
-            error: req.query.error || null
+            error: req.query.error || null,
+            unreadCount: user.unreadCount
         });
     } catch (err) {
         res.render('topics', {
@@ -52,7 +55,8 @@ const getAllTopics = async (req, res) => {
             subscribedIds: [],
             userId: '',
             username: req.session.username,
-            error: 'Could not load topics.'
+            error: 'Could not load topics.',
+            unreadCount: 0
         });
     }
 };
@@ -72,9 +76,11 @@ const createTopic = async (req, res) => {
             $addToSet: { subscribedTopics: topic._id }
         });
 
+        // Pass userId so observer can notify the creator
         topicSubject.notify('topic_created', {
             topicId: topic._id,
-            topicTitle: topic.title
+            topicTitle: topic.title,
+            userId: req.session.userId
         });
 
         res.redirect('/dashboard');
@@ -88,9 +94,7 @@ const getTopicDetail = async (req, res) => {
         const topic = await Topic.findById(req.params.id).populate('createdBy', 'username');
         if (!topic) return res.redirect('/topics');
 
-        topic.accessCount += 1;
-        await topic.save();
-
+        // accessCount increment removed — observer handles it now
         topicSubject.notify('topic_accessed', {
             topicId: topic._id,
             topicTitle: topic.title
@@ -101,6 +105,10 @@ const getTopicDetail = async (req, res) => {
             .sort({ createdAt: -1 });
 
         const user = await User.findById(req.session.userId);
+
+        // Reset unread count when user opens a topic
+        await User.findByIdAndUpdate(req.session.userId, { unreadCount: 0 });
+
         const isSubscribed = user.subscribedTopics
             .map(id => id.toString())
             .includes(topic._id.toString());
@@ -110,7 +118,8 @@ const getTopicDetail = async (req, res) => {
             messages,
             isSubscribed,
             username: req.session.username,
-            currentUserId: req.session.userId.toString()
+            currentUserId: req.session.userId.toString(),
+            unreadCount: 0
         });
     } catch (err) {
         res.redirect('/topics');
@@ -119,12 +128,23 @@ const getTopicDetail = async (req, res) => {
 
 const subscribeTopic = async (req, res) => {
     try {
-        await Topic.findByIdAndUpdate(req.params.id, {
+        // returnDocument: 'after' replaces deprecated { new: true }
+        const topic = await Topic.findByIdAndUpdate(req.params.id, {
             $addToSet: { subscribers: req.session.userId }
-        });
+        }, { returnDocument: 'after' }); // ← fixed
+
         await User.findByIdAndUpdate(req.session.userId, {
             $addToSet: { subscribedTopics: req.params.id }
         });
+
+        // Fire subscribe event — observer handles notification
+        topicSubject.notify('topic_subscribed', {
+            userId: req.session.userId,
+            username: req.session.username,
+            topicId: topic._id,
+            topicTitle: topic.title
+        });
+
         res.redirect('/topics');
     } catch (err) {
         res.redirect('/topics');
@@ -133,12 +153,23 @@ const subscribeTopic = async (req, res) => {
 
 const unsubscribeTopic = async (req, res) => {
     try {
-        await Topic.findByIdAndUpdate(req.params.id, {
+        // returnDocument: 'after' replaces deprecated { new: true }
+        const topic = await Topic.findByIdAndUpdate(req.params.id, {
             $pull: { subscribers: req.session.userId }
-        });
+        }, { returnDocument: 'after' }); // ← fixed
+
         await User.findByIdAndUpdate(req.session.userId, {
             $pull: { subscribedTopics: req.params.id }
         });
+
+        // Fire unsubscribe event — observer handles notification
+        topicSubject.notify('topic_unsubscribed', {
+            userId: req.session.userId,
+            username: req.session.username,
+            topicId: topic._id,
+            topicTitle: topic.title
+        });
+
         const referer = req.headers.referer || '/dashboard';
         res.redirect(referer);
     } catch (err) {

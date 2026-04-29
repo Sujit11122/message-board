@@ -9,59 +9,123 @@
     <style>
         body { font-family: 'Space Grotesk', sans-serif; }
         .mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Animated gradient background */
+        .bg-animated {
+            background: linear-gradient(135deg, #0f172a 0%, #0d1f2d 50%, #0f172a 100%);
+        }
+
+        /* Glow effect behind card */
+        .card-glow {
+            position: relative;
+        }
+        .card-glow::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 1rem;
+            background: linear-gradient(135deg, #0d9488, #0891b2, #0d9488);
+            opacity: 0.3;
+            z-index: -1;
+            filter: blur(8px);
+        }
+
         .input-field {
-            background: #111827;
-            border: 1px solid #1f2937;
-            color: #f3f4f6;
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            background: #0d1520;
+            border: 1px solid #1e293b;
+            color: #f1f5f9;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
         .input-field:focus {
             outline: none;
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+            border-color: #0d9488;
+            box-shadow: 0 0 0 3px rgba(13,148,136,0.15);
         }
-        .input-field::placeholder { color: #4b5563; }
-        .submit-btn { transition: background 0.15s ease, transform 0.1s ease; }
-        .submit-btn:hover { background: #4f46e5; }
+        .input-field::placeholder { color: #475569; }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #0d9488, #0891b2);
+            transition: opacity 0.15s ease, transform 0.1s ease;
+        }
+        .submit-btn:hover { opacity: 0.9; }
         .submit-btn:active { transform: scale(0.98); }
+
+        /* Floating dots decoration */
+        .dot {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.07;
+            background: #0d9488;
+        }
     </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen flex items-center justify-center px-4">
+<body class="bg-animated text-gray-100 min-h-screen flex items-center justify-center px-4 overflow-hidden relative">
 
-    <div class="w-full max-w-md">
+    <!-- Background decoration dots -->
+    <div class="dot w-72 h-72 -top-20 -left-20"></div>
+    <div class="dot w-96 h-96 -bottom-32 -right-32"></div>
+    <div class="dot w-48 h-48 top-1/2 left-1/4"></div>
 
-        <div class="text-center mb-10">
-            <div class="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-semibold mono text-lg mx-auto mb-4">MB</div>
+    <div class="w-full max-w-md relative z-10">
+
+        <!-- Logo & Title -->
+        <div class="text-center mb-8">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white font-bold mono text-xl mx-auto mb-5 shadow-lg shadow-teal-900/40">
+                MB
+            </div>
             <h1 class="text-2xl font-semibold text-white">Welcome back</h1>
-            <p class="text-gray-500 text-sm mt-1">Sign in to your account</p>
+            <p class="text-slate-500 text-sm mt-1">Sign in to your account</p>
         </div>
 
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl p-8">
+        <!-- Card -->
+        <div class="card-glow">
+            <div class="bg-gray-900/90 border border-slate-800 rounded-2xl p-8 backdrop-blur-sm">
 
-            <% if (error) { %>
-                <div class="bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg px-4 py-3 mb-6 mono">
-                    // <%= error %>
-                </div>
-            <% } %>
+                <% if (error) { %>
+                    <div class="bg-red-500/10 border border-red-500/20 text-red-400 text-sm rounded-lg px-4 py-3 mb-6 mono">
+                        // <%= error %>
+                    </div>
+                <% } %>
 
-            <form action="/login" method="POST" class="flex flex-col gap-5">
-                <div>
-                    <label class="block text-gray-400 text-sm mb-2 mono">email</label>
-                    <input type="email" name="email" required placeholder=" " class="input-field w-full rounded-lg px-4 py-3 text-sm" />
-                </div>
-                <div>
-                    <label class="block text-gray-400 text-sm mb-2 mono">password</label>
-                    <input type="password" name="password" required placeholder=" " class="input-field w-full rounded-lg px-4 py-3 text-sm" />
-                </div>
-                <button type="submit" class="submit-btn bg-indigo-600 text-white font-medium text-sm py-3 rounded-lg mt-1 cursor-pointer">
-                    Sign in
-                </button>
-            </form>
+                <form action="/login" method="POST" class="flex flex-col gap-5">
 
+                    <div>
+                        <label class="block text-slate-400 text-xs mb-2 mono tracking-wider uppercase">Email</label>
+                        <input
+                            type="email"
+                            name="email"
+                            required
+                            placeholder=" "
+                            class="input-field w-full rounded-xl px-4 py-3 text-sm"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="block text-slate-400 text-xs mb-2 mono tracking-wider uppercase">Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            required
+                            placeholder="   "
+                            class="input-field w-full rounded-xl px-4 py-3 text-sm"
+                        />
+                    </div>
+
+                    <button type="submit" class="submit-btn text-white font-medium text-sm py-3 rounded-xl mt-2 cursor-pointer shadow-lg shadow-teal-900/30">
+                        Sign in →
+                    </button>
+
+                </form>
+
+            </div>
         </div>
 
-        <p class="text-center text-gray-600 text-sm mt-6">
-            Don't have an account? <a href="/register" class="text-indigo-400 hover:text-indigo-300 transition-colors">Register here</a>
+        <!-- Register link -->
+        <p class="text-center text-slate-600 text-sm mt-6">
+            Don't have an account?
+            <a href="/register" class="text-teal-400 hover:text-teal-300 transition-colors font-medium">
+                Register here
+            </a>
         </p>
 
     </div>

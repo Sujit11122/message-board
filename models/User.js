@@ -18,7 +18,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    subscribedTopics: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Topic' }] // ← add this line
+    subscribedTopics: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Topic' }], // ← comma added
+    unreadCount: { type: Number, default: 0 } // ← now works
 }, { timestamps: true });
 
 // Hash password before saving

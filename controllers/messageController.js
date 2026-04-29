@@ -26,7 +26,8 @@ const postMessage = async (req, res) => {
         topicSubject.notify('message_posted', {
             topicId: topic._id,
             topicTitle: topic.title,
-            message: content
+            message: content,
+            authorId: req.session.userId
         });
 
         res.redirect(`/topics/${topicId}`);
@@ -40,7 +41,6 @@ const deleteMessage = async (req, res) => {
 
         if (!message) return res.redirect('back');
 
-        // Only author can delete
         if (message.author.toString() !== req.session.userId.toString()) {
             return res.redirect('back');
         }
@@ -60,7 +60,6 @@ const editMessage = async (req, res) => {
 
         if (!message) return res.redirect('back');
 
-        // Only author can edit
         if (message.author.toString() !== req.session.userId.toString()) {
             return res.redirect('back');
         }

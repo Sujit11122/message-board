@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const topicController = require('../controllers/topicController');
 const messageController = require('../controllers/messageController');
+const notificationController = require('../controllers/notificationController');
 const statsController = require('../controllers/statsController');
 const authMiddleware = require('../middleware/authMiddleware');
 
@@ -15,5 +16,9 @@ router.post('/topics/:topicId/messages', authMiddleware, messageController.postM
 router.post('/messages/:messageId/delete', authMiddleware, messageController.deleteMessage);
 router.post('/messages/:messageId/edit', authMiddleware, messageController.editMessage);
 router.get('/stats', authMiddleware, statsController.getStats);
+router.get('/notifications', authMiddleware, notificationController.getNotifications);
+router.post('/notifications/read', authMiddleware, notificationController.markAllRead);
+router.post('/notifications/:id/read', authMiddleware, notificationController.markOneRead);
+
 
 module.exports = router;
