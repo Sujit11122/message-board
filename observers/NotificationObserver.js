@@ -25,7 +25,7 @@ class NotificationObserver {
             case 'topic_accessed':
                 console.log(`[Observer] Topic accessed: "${data.topicTitle}"`);
                 try {
-                    // Increment access count — moved from controller to observer ✅
+                    // Increment access count — moved from controller to observer 
                     await Topic.findByIdAndUpdate(data.topicId, {
                         $inc: { accessCount: 1 }
                     });

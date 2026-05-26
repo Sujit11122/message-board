@@ -20,7 +20,8 @@ const getStats = async (req, res) => {
         res.render('stats', {
             topicsWithCounts,
             username: req.session.username,
-            unreadCount: user.unreadCount 
+            unreadCount: user.unreadCount,
+             currentUser: user 
         });
     } catch (err) {
         res.render('stats', {

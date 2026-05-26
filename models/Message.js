@@ -6,7 +6,9 @@ const messageSchema = new mongoose.Schema({
     topic: { type: mongoose.Schema.Types.ObjectId, ref: 'Topic' },
     createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date, default: null },
-    isEdited: { type: Boolean, default: false }
+    isEdited: { type: Boolean, default: false },
+    upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 });
 
 module.exports = mongoose.model('Message', messageSchema);

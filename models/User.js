@@ -18,8 +18,16 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    subscribedTopics: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Topic' }], // ← comma added
-    unreadCount: { type: Number, default: 0 } // ← now works
+    subscribedTopics: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Topic' }], 
+    unreadCount: { type: Number, default: 0 },
+    bio: { type: String, default: '', maxlength: 160 },
+    avatar: { type: String, default: '' },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    reputation: { type: Number, default: 0 },
+    badges: [{ type: String }],
+    joinedAt: { type: Date, default: Date.now }
+
 }, { timestamps: true });
 
 // Hash password before saving

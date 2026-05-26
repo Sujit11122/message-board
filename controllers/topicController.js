@@ -22,7 +22,8 @@ const getDashboard = async (req, res) => {
         res.render('dashboard', {
             username: req.session.username,
             topicsWithMessages,
-            unreadCount: user.unreadCount
+            unreadCount: user.unreadCount,
+            currentUser: user
         });
     } catch (err) {
         console.error('Dashboard error:', err);
@@ -56,7 +57,8 @@ const getAllTopics = async (req, res) => {
             userId: '',
             username: req.session.username,
             error: 'Could not load topics.',
-            unreadCount: 0
+            unreadCount: 0,
+             currentUser: user
         });
     }
 };
@@ -80,7 +82,8 @@ const createTopic = async (req, res) => {
         topicSubject.notify('topic_created', {
             topicId: topic._id,
             topicTitle: topic.title,
-            userId: req.session.userId
+            userId: req.session.userId,
+             currentUser: user
         });
 
         res.redirect('/dashboard');

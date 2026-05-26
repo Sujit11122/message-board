@@ -72,7 +72,9 @@
                                         <div class="msg-item pl-4 py-1">
                                             <div class="flex items-center gap-2 mb-1">
                                                 <span class="text-teal-400 text-sm font-medium"><%= message.author.username %></span>
-                                                <span class="text-gray-600 mono text-xs"><%= new Date(message.createdAt).toLocaleString() %></span>
+                                                <span class="text-gray-600 mono text-xs"
+                                                     data-time="<%= message.createdAt %>">
+                                                </span>
                                             </div>
                                             <p class="text-gray-300 text-sm"><%= message.content %></p>
                                         </div>

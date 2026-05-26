@@ -81,12 +81,50 @@
 
                         <div class="flex items-center justify-between mb-1">
                             <div class="flex items-center gap-2">
-                                <span class="text-teal-400 text-sm font-medium"><%= message.author.username %></span>
-                                <span class="text-gray-600 mono text-xs"><%= new Date(message.createdAt).toLocaleString() %></span>
+                                <!-- ← clickable username → profile -->
+                                <a href="/profile/<%= message.author.username %>"
+                                    class="text-teal-400 text-sm font-medium hover:text-teal-300 transition-colors">
+                                    <%= message.author.username %>
+                                </a>
+                               <span class="text-gray-600 mono text-xs"
+                                    data-time="<%= message.createdAt %>">
+                                </span>
                             </div>
 
-                            <% if (currentUserId && message.author._id.toString() === currentUserId) { %>
-                                <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-3">
+
+                                <!-- ← Vote buttons (only for other users messages) -->
+                                <% if (currentUserId && message.author._id.toString() !== currentUserId) { %>
+                                    <div class="flex items-center gap-1">
+                                        <button
+                                            onclick="vote('<%= message._id %>', 'upvote')"
+                                            id="upvote-<%= message._id %>"
+                                            class="mono text-xs px-2 py-1 rounded-lg cursor-pointer transition-colors
+                                                <%= message.upvotes && message.upvotes.map(id => id.toString()).includes(currentUserId) ? 'text-teal-400 bg-teal-500/10' : 'text-gray-500 hover:text-teal-400' %>">
+                                            👍 <span id="upcount-<%= message._id %>"><%= message.upvotes ? message.upvotes.length : 0 %></span>
+                                        </button>
+                                        <button
+                                            onclick="vote('<%= message._id %>', 'downvote')"
+                                            id="downvote-<%= message._id %>"
+                                            class="mono text-xs px-2 py-1 rounded-lg cursor-pointer transition-colors
+                                                <%= message.downvotes && message.downvotes.map(id => id.toString()).includes(currentUserId) ? 'text-red-400 bg-red-500/10' : 'text-gray-500 hover:text-red-400' %>">
+                                            👎 <span id="downcount-<%= message._id %>"><%= message.downvotes ? message.downvotes.length : 0 %></span>
+                                        </button>
+                                    </div>
+                                <% } else { %>
+                                    <!-- ← Just show counts for own messages -->
+                                    <div class="flex items-center gap-1">
+                                        <span class="mono text-xs text-gray-600">
+                                            👍 <%= message.upvotes ? message.upvotes.length : 0 %>
+                                        </span>
+                                        <span class="mono text-xs text-gray-600">
+                                            👎 <%= message.downvotes ? message.downvotes.length : 0 %>
+                                        </span>
+                                    </div>
+                                <% } %>
+
+                                <!-- Edit/Delete buttons -->
+                                <% if (currentUserId && message.author._id.toString() === currentUserId) { %>
                                     <button onclick="toggleEdit('<%= message._id %>')"
                                         class="mono text-xs text-gray-500 hover:text-teal-400 transition-colors cursor-pointer">
                                         edit
@@ -98,15 +136,16 @@
                                             delete
                                         </button>
                                     </form>
-                                </div>
-                            <% } %>
+                                <% } %>
+
+                            </div>
                         </div>
 
                         <!-- Message content -->
                         <p class="text-gray-300 text-sm" id="content-<%= message._id %>"><%= message.content %></p>
                         <% if (message.isEdited) { %>
                             <span class="mono text-xs text-gray-600">
-                                edited · <%= new Date(message.updatedAt).toLocaleString() %>
+                                edited · <span data-time="<%= message.updatedAt %>"></span>
                             </span>
                         <% } %>
 
@@ -143,6 +182,45 @@
             const form = document.getElementById('edit-form-' + messageId);
             content.classList.toggle('hidden');
             form.classList.toggle('hidden');
+        }
+
+        // Vote function
+        async function vote(messageId, type) {
+            try {
+                const res = await fetch(`/messages/${messageId}/${type}`, { method: 'POST' });
+                const data = await res.json();
+
+                if (!data.success) {
+                    console.log(data.error);
+                    return;
+                }
+
+                // Get updated counts
+                const countsRes = await fetch(`/messages/${messageId}/votes`);
+                const counts = await countsRes.json();
+
+                // Update count displays
+                document.getElementById(`upcount-${messageId}`).textContent = counts.upvotes;
+                document.getElementById(`downcount-${messageId}`).textContent = counts.downvotes;
+
+                // Update button styles
+                const upBtn = document.getElementById(`upvote-${messageId}`);
+                const downBtn = document.getElementById(`downvote-${messageId}`);
+
+                // Reset both buttons first
+                upBtn.className = 'mono text-xs px-2 py-1 rounded-lg cursor-pointer transition-colors text-gray-500 hover:text-teal-400';
+                downBtn.className = 'mono text-xs px-2 py-1 rounded-lg cursor-pointer transition-colors text-gray-500 hover:text-red-400';
+
+                // Highlight active vote
+                if (counts.userUpvoted) {
+                    upBtn.className = 'mono text-xs px-2 py-1 rounded-lg cursor-pointer transition-colors text-teal-400 bg-teal-500/10';
+                } else if (counts.userDownvoted) {
+                    downBtn.className = 'mono text-xs px-2 py-1 rounded-lg cursor-pointer transition-colors text-red-400 bg-red-500/10';
+                }
+
+            } catch(err) {
+                console.log('Vote error:', err);
+            }
         }
     </script>
 

@@ -6,7 +6,10 @@ const topicSchema = new mongoose.Schema({
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     subscribers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     accessCount: { type: Number, default: 0 },
-    createdAt: { type: Date, default: Date.now }
+    createdAt: { type: Date, default: Date.now },
+     likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    tags: [{ type: String }],
+    category: { type: String, default: 'General' }
 });
 
 module.exports = mongoose.model('Topic', topicSchema);

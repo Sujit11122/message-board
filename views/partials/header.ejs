@@ -24,10 +24,9 @@
                     </span>
                 </button>
 
-                <!-- Dropdown -->
+                <!-- Notification Dropdown -->
                 <div id="notif-dropdown"
                     class="hidden absolute right-0 mt-2 w-80 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl z-50">
-
                     <div class="flex items-center justify-between px-4 py-3 border-b border-gray-700">
                         <span class="text-white text-sm font-medium">Notifications</span>
                         <button onclick="markAllRead()"
@@ -35,26 +34,105 @@
                             Mark all read
                         </button>
                     </div>
-
                     <div id="notif-list" class="max-h-80 overflow-y-auto">
                         <p class="text-gray-500 text-sm text-center py-6">Loading...</p>
                     </div>
-
                 </div>
             </div>
 
-            <a href="/logout" class="nav-link text-red-400 text-sm px-4 py-2 rounded-lg">Logout</a>
+            <!-- 👤 Profile Avatar Dropdown -->
+            <div class="relative ml-2" id="profile-wrapper">
+                <button onclick="toggleProfileMenu()"
+                    class="flex items-center gap-2 cursor-pointer bg-transparent border-0 focus:outline-none">
+                    <% if (typeof currentUser !== 'undefined' && currentUser && currentUser.avatar) { %>
+                        <img src="<%= currentUser.avatar %>"
+                            class="w-9 h-9 rounded-full object-cover border-2 border-teal-500/50 hover:border-teal-400 transition-colors"
+                            alt="avatar" />
+                    <% } else { %>
+                        <div class="w-9 h-9 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white text-sm font-bold mono border-2 border-teal-500/30 hover:border-teal-400 transition-colors">
+                            <%= (typeof username !== 'undefined' && username) ? username.charAt(0).toUpperCase() : '?' %>
+                        </div>
+                    <% } %>
+                </button>
+
+                <!-- Profile Dropdown Menu -->
+                <div id="profile-dropdown"
+                    class="hidden absolute right-0 mt-2 w-56 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl z-50">
+
+                    <!-- User info header -->
+                    <div class="px-4 py-3 border-b border-gray-800">
+                        <div class="flex items-center gap-3">
+                            <% if (typeof currentUser !== 'undefined' && currentUser && currentUser.avatar) { %>
+                                <img src="<%= currentUser.avatar %>"
+                                    class="w-8 h-8 rounded-full object-cover"
+                                    alt="avatar" />
+                            <% } else { %>
+                                <div class="w-8 h-8 rounded-full bg-gradient-to-br from-teal-500 to-cyan-600 flex items-center justify-center text-white text-xs font-bold mono">
+                                    <%= (typeof username !== 'undefined' && username) ? username.charAt(0).toUpperCase() : '?' %>
+                                </div>
+                            <% } %>
+                            <div>
+                                <p class="text-white text-sm font-medium"><%= (typeof username !== 'undefined') ? username : '' %></p>
+                                <% if (typeof currentUser !== 'undefined' && currentUser) { %>
+                                    <p class="text-teal-400 text-xs mono"><%= currentUser.reputation || 0 %> rep</p>
+                                <% } %>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Menu items -->
+                    <div class="py-1">
+                        <a href="/profile/<%= (typeof username !== 'undefined') ? username : '' %>"
+                            class="flex items-center gap-3 px-4 py-2.5 text-gray-300 text-sm hover:bg-gray-800 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="8" r="4"/>
+                                <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+                            </svg>
+                            My Profile
+                        </a>
+
+                        <a href="/dashboard"
+                            class="flex items-center gap-3 px-4 py-2.5 text-gray-300 text-sm hover:bg-gray-800 hover:text-white transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7"/>
+                                <rect x="14" y="3" width="7" height="7"/>
+                                <rect x="3" y="14" width="7" height="7"/>
+                                <rect x="14" y="14" width="7" height="7"/>
+                            </svg>
+                            Dashboard
+                        </a>
+                    </div>
+
+                    <!-- Logout -->
+                    <div class="border-t border-gray-800 py-1">
+                        <a href="/logout"
+                            class="flex items-center gap-3 px-4 py-2.5 text-red-400 text-sm hover:bg-gray-800 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                                <polyline points="16,17 21,12 16,7"/>
+                                <line x1="21" y1="12" x2="9" y2="12"/>
+                            </svg>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </header>
 
 <script>
     let dropdownOpen = false;
+    let profileMenuOpen = false;
 
     function toggleNotifications() {
         dropdownOpen = !dropdownOpen;
         const dropdown = document.getElementById('notif-dropdown');
         if (dropdownOpen) {
+            // close profile menu
+            document.getElementById('profile-dropdown').classList.add('hidden');
+            profileMenuOpen = false;
             dropdown.classList.remove('hidden');
             loadNotifications();
         } else {
@@ -62,11 +140,31 @@
         }
     }
 
-    document.addEventListener('click', function(e) {
-        const wrapper = document.getElementById('notif-wrapper');
-        if (wrapper && !wrapper.contains(e.target)) {
+    function toggleProfileMenu() {
+        profileMenuOpen = !profileMenuOpen;
+        const dropdown = document.getElementById('profile-dropdown');
+        if (profileMenuOpen) {
+            // close notifications
             document.getElementById('notif-dropdown').classList.add('hidden');
             dropdownOpen = false;
+            dropdown.classList.remove('hidden');
+        } else {
+            dropdown.classList.add('hidden');
+        }
+    }
+
+    // Close both dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        const notifWrapper = document.getElementById('notif-wrapper');
+        const profileWrapper = document.getElementById('profile-wrapper');
+
+        if (notifWrapper && !notifWrapper.contains(e.target)) {
+            document.getElementById('notif-dropdown').classList.add('hidden');
+            dropdownOpen = false;
+        }
+        if (profileWrapper && !profileWrapper.contains(e.target)) {
+            document.getElementById('profile-dropdown').classList.add('hidden');
+            profileMenuOpen = false;
         }
     });
 
@@ -123,36 +221,30 @@
 
     async function markOneRead(event, notifId, topicId) {
         event.preventDefault();
-
         try {
             await fetch(`/notifications/${notifId}/read`, { method: 'POST' });
-
             const dot = document.getElementById(`dot-${notifId}`);
             const text = document.getElementById(`text-${notifId}`);
             if (dot) {
-                dot.classList.remove('bg-teal-500'); // ← updated
+                dot.classList.remove('bg-teal-500');
                 dot.classList.add('bg-gray-600');
             }
             if (text) {
                 text.classList.remove('text-gray-200');
                 text.classList.add('text-gray-500');
             }
-
             const badge = document.getElementById('notif-badge');
             let current = parseInt(badge.textContent) || 0;
             current = Math.max(0, current - 1);
-
             if (current > 0) {
                 badge.textContent = current;
             } else {
                 badge.classList.add('hidden');
                 badge.textContent = '';
             }
-
         } catch(err) {
             console.log('Error marking as read');
         }
-
         window.location.href = `/topics/${topicId}`;
     }
 
@@ -162,7 +254,6 @@
             const data = await res.json();
             const unread = data.notifications.filter(n => !n.isRead).length;
             const badge = document.getElementById('notif-badge');
-
             if (unread > 0) {
                 badge.classList.remove('hidden');
                 badge.textContent = unread;
@@ -174,4 +265,26 @@
             console.log('Polling error');
         }
     }, 15000);
+
+    // Convert all timestamps to local timezone
+    function formatLocalTime(dateString) {
+         return new Date(dateString).toLocaleString(undefined, {
+        year: 'numeric',
+        month: 'numeric',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    });
+    }
+// Auto convert all elements with data-time attribute
+    function convertAllTimes() {
+     document.querySelectorAll('[data-time]').forEach(el => {
+         const raw = el.getAttribute('data-time');
+        if (raw) el.textContent = formatLocalTime(raw);
+     });
+    }
+// Run on page load
+document.addEventListener('DOMContentLoaded', convertAllTimes);
 </script>
